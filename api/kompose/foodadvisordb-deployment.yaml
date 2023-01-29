@@ -1,0 +1,123 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f ../docker-compose.yml
+    kompose.version: 1.27.0 (HEAD)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: foodadvisordb
+  name: foodadvisordb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: foodadvisordb
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f ../docker-compose.yml
+        kompose.version: 1.27.0 (HEAD)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/foodadvisor: "true"
+        io.kompose.service: foodadvisordb
+    spec:
+      containers:
+        - env:
+            - name: ADMIN_JWT_SECRET
+              valueFrom:
+                configMapKeyRef:
+                  key: ADMIN_JWT_SECRET
+                  name: env
+            - name: DATABASE_CLIENT
+              valueFrom:
+                configMapKeyRef:
+                  key: DATABASE_CLIENT
+                  name: env
+            - name: DATABASE_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: DATABASE_HOST
+                  name: env
+            - name: DATABASE_NAME
+              valueFrom:
+                configMapKeyRef:
+                  key: DATABASE_NAME
+                  name: env
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  key: DATABASE_PASSWORD
+                  name: env
+            - name: DATABASE_PORT
+              valueFrom:
+                configMapKeyRef:
+                  key: DATABASE_PORT
+                  name: env
+            - name: DATABASE_USERNAME
+              valueFrom:
+                configMapKeyRef:
+                  key: DATABASE_USERNAME
+                  name: env
+            - name: HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: HOST
+                  name: env
+            - name: JWT_SECRET
+              valueFrom:
+                configMapKeyRef:
+                  key: JWT_SECRET
+                  name: env
+            - name: NODE_ENV
+              valueFrom:
+                configMapKeyRef:
+                  key: NODE_ENV
+                  name: env
+            - name: PORT
+              valueFrom:
+                configMapKeyRef:
+                  key: PORT
+                  name: env
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  key: DATABASE_NAME
+                  name: env
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  key: DATABASE_PASSWORD
+                  name: env
+            - name: POSTGRES_USER
+              valueFrom:
+                configMapKeyRef:
+                  key: DATABASE_USERNAME
+                  name: env
+            - name: STRAPI_ADMIN_CLIENT_PREVIEW_SECRET
+              valueFrom:
+                configMapKeyRef:
+                  key: STRAPI_ADMIN_CLIENT_PREVIEW_SECRET
+                  name: env
+            - name: STRAPI_ADMIN_CLIENT_URL
+              valueFrom:
+                configMapKeyRef:
+                  key: STRAPI_ADMIN_CLIENT_URL
+                  name: env
+          image: postgres:14.5-alpine
+          name: foodadvisordb
+          ports:
+            - containerPort: 5432
+          resources: {}
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data/
+              name: foodadvisor-data
+      restartPolicy: Always
+      volumes:
+        - name: foodadvisor-data
+          persistentVolumeClaim:
+            claimName: foodadvisor-data
+status: {}
